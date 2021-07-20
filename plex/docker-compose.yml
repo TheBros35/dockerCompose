@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  plex:
+    image: plexinc/pms-docker
+    container_name: Plex
+    network_mode: host
+    volumes:
+      - /plex/library:/config
+      - /plex/tvseries:/tv
+      - /plex/movies:/movies
+    restart: unless-stopped
