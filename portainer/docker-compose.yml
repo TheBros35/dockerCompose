@@ -2,9 +2,8 @@ version: "3.7"
 services:
   portainer:
     image: portainer/portainer-ce
-    container_name: Portainer
+    container_name: portainer
     restart: always
-    network_mode: host
     ports:
       - "9000:9000"
       - "8000:8000"
