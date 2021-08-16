@@ -1,0 +1,15 @@
+version: '3'
+services:
+  pigallery2:
+    image: bpatrik/pigallery2:latest-debian-buster
+    container_name: pigallery2
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - "/dockerVol/pigallery2/config:/app/data/config" # CHANGE ME
+      - "/dockerVol/pigallery2/db:/app/data/db"
+      - "/mnt/stuffmnt:/app/data/images" # CHANGE ME
+      - "/dockerVol/pigallery2/tmp:/app/data/tmp" # CHANGE ME
+    ports:
+      - 80:80
+    restart: always
