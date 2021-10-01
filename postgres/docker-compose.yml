@@ -1,0 +1,25 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: Thinbirds1!
+    volumes:
+      - postgresDB:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+ 
+  admin:
+    image: dpage/pgadmin4
+    ports:
+      - 5020:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: bpambrose97@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Thinbirds1!
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+volumes:
+  pgadmin:
+  postgresDB:
