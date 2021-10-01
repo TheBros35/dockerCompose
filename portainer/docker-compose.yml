@@ -2,6 +2,7 @@ services:
   portainer:
     image: portainer/portainer-ce
     container_name: portainer
+    network_mode: bridge
     restart: always
     ports:
       - "9000:9000"
