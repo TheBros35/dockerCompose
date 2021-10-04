@@ -6,10 +6,14 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - "/dockerVol/pigallery2/config:/app/data/config" # CHANGE ME
-      - "/dockerVol/pigallery2/db:/app/data/db"
-      - "/mnt/stuffmnt:/app/data/images" # CHANGE ME
-      - "/dockerVol/pigallery2/tmp:/app/data/tmp" # CHANGE ME
+      - piVolConfig:/app/data/config # CHANGE ME
+      - piVolDb:/app/data/config
+      - piVolTmp:/app/data/tmp
+      - "/shared/Movies/Movies/Stuff:/app/data/images"
     ports:
-      - 80:80
+      - 6969:80
     restart: always
+volumes:
+  piVolTmp:
+  piVolDb:
+  piVolConfig:
