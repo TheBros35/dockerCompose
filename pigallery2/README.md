@@ -4,3 +4,4 @@ Also this line (modify to your liking) will mount a publically accessible samba 
 
 //192.168.1.17/Movies/Stuff /mnt/stuffmnt cifs guest,uid=1000,iocharset=utf8 0 0 
 
+default username and password are both admin.
