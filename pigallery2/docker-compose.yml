@@ -9,7 +9,7 @@ services:
       - piVolConfig:/app/data/config # CHANGE ME
       - piVolDb:/app/data/config
       - piVolTmp:/app/data/tmp
-      - "/shared/Movies/Movies/Stuff:/app/data/images"
+      - "/mnt/Movies/Stuff:/app/data/images"
     ports:
       - 6969:80
     restart: always
