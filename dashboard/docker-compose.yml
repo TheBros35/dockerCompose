@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  dashboard:
+    image: phntxx/dashboard:latest
+    restart: unless-stopped
+    volumes:
+      - dashboard:/app/data
+    ports:
+      - 8080:8080
+
+volumes:
+  dashboard:
