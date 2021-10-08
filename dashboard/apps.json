@@ -1,40 +1,4 @@
 {
-  "categories": [
-    {
-      "name": "Networking",
-      "items": [
-        {
-          "name": "pfSense",
-          "displayURL": "example.com",
-          "url": "https://example.com",
-          "icon": "security"
-        },
-        {
-          "name": "Pihole",
-          "displayURL": "example.com",
-          "url": "https://example.com",
-          "icon": "vpn_lock"
-        }
-      ]
-    },
-    {
-      "name": "Monitoring",
-      "items": [
-        {
-          "name": "Tautulli",
-          "displayURL": "example.com",
-          "url": "https://example.com",
-          "icon": "bar_chart"
-        },
-        {
-          "name": "Grafana",
-          "displayURL": "example.com",
-          "url": "https://example.com",
-          "icon": "show_chart"
-        }
-      ]
-    }
-  ],
   "apps": [
     {
       "name": "Plex",
@@ -46,13 +10,13 @@
       "name": "piGallery2",
       "displayURL": "pigallery2.ambrose.cloud",
       "url": "http://192.168.1.10:6969",
-      "icon": "filter_drama"
+      "icon": "movie"
     },
     {
       "name": "Portainer",
       "displayURL": "portainer.ambrose.cloud",
-      "url": "https://192.168.1.10:9000",
-      "icon": "rss_feed"
+      "url": "http://192.168.1.10:9000",
+      "icon": "web" 
     },
     {
       "name": "PVE",
