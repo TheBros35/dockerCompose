@@ -11,4 +11,4 @@ services:
       - /mnt/plexconfig:/config
       - /mnt/software/TVShows:/tv
       - /mnt/movies:/movies
-    restart: always
+    restart: unless-stopped
