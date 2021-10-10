@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  unbound:
+    image: mvance/unbound
+    ports:
+      - 53:53
+    restart: unless-stopped
+    volume:
+      /home/bambrose/unbound:/opt/unbound/etc/unbound
+
