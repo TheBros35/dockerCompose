@@ -1,0 +1,28 @@
+version: '3.4'
+services:
+  stash:
+    image: stashapp/stash:latest
+    container_name: stash
+    restart: unless-stopped
+    ports:
+      - "6969:9999"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "2m"
+    environment:
+      - STASH_STASH=/data/
+      - STASH_GENERATED=/stashVol/generated/
+      - STASH_METADATA=/stashVol/metadata/
+      - STASH_CACHE=/stashVol/cache/
+      - STASH_PORT=9999
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - stashConfig:/root/.stash
+      - /mnt/movies/Stuff:/data
+      - stashVol:/stashVol
+
+volumes:
+  stashConfig:
+  stashVol:
