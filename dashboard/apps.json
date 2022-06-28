@@ -7,8 +7,8 @@
       "icon": "tv"
     },
     {
-      "name": "piGallery2",
-      "displayURL": "pigallery2.ambrose.cloud",
+      "name": "Stash",
+      "displayURL": "stash.ambrose.cloud",
       "url": "http://192.168.1.10:6969",
       "icon": "movie"
     },
@@ -23,6 +23,12 @@
       "displayURL": "pve.ambrose.cloud",
       "url": "https://192.168.1.5:8006",
       "icon": "dns"
+    },
+    {
+	    "name":"Spook",
+	    "displayURL": "spook.ambrose.cloud",
+	    "url": "http://192.168.1.8:4321",
+	    "icon":"web"
     }
   ]
 }
