@@ -3,11 +3,13 @@ version: "3"
 services:
   spook:
     image: thebros35/spook
-    ports:
-      - "4321:8000"
+    #ports:
+    #  - "4321:8000"
+    #  - "9:9/udp"
     volumes:
       - spookVolume:/app/db
     restart: always
+    network_mode: host
 
 volumes:
   spookVolume:
