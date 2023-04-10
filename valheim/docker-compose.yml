@@ -2,7 +2,7 @@ version: "3"
 
 services: 
   valheim: 
-    image: ghcr.io/lloesche/valheim-server
+    image: lloesche/valheim-server
     cap_add:
       - sys_nice
     volumes: 
