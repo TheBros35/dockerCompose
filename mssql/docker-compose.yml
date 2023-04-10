@@ -6,7 +6,7 @@ services:
     environment:
       - MSSQL_PID=Developer
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=Thinbirds1!
+      - MSSQL_SA_PASSWORD=Thinbirds1!
     volumes:
       - 'mssqlVol:/var/opt/mssql'
 
