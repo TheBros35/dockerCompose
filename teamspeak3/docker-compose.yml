@@ -1,0 +1,16 @@
+version: '3'
+services:
+  teamspeak:
+    image: mbentley/teamspeak
+    restart: unless-stopped
+    ports:
+      - 9987:9987/udp
+      - 10011:10011
+      - 30033:30033
+    environment:
+      TS3SERVER_LICENSE: "accept"
+      TS3SERVER_GDPR_SAVE: "false"
+    volumes:
+      - ts3data:/data
+volumes:
+  ts3data:
