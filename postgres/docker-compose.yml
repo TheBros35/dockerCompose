@@ -1,22 +1,24 @@
 services:
 
   db:
+    container_name: postgresdb
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: Thinbirds1!
+      POSTGRES_PASSWORD: sparky
     volumes:
       - postgresDB:/var/lib/postgresql/data
     ports:
       - 5432:5432
- 
+
   admin:
+    container_name: pgadmin
     image: dpage/pgadmin4
     ports:
       - 5020:80
     environment:
       PGADMIN_DEFAULT_EMAIL: bpambrose97@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: Thinbirds1!
+      PGADMIN_DEFAULT_PASSWORD: sparky
     volumes:
       - pgadmin:/var/lib/pgadmin
 
