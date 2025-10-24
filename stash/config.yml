@@ -1,0 +1,191 @@
+blobs_path: /root/.stash/blobs
+blobs_storage: FILESYSTEM
+calculate_md5: false
+create_image_clip_from_videos: false
+dangerous_allow_public_without_auth: "false"
+database: /root/.stash/stash-go.sqlite
+defaults:
+    delete_file: true
+    identify_task:
+        options:
+            fieldoptions:
+                - createmissing: null
+                  field: title
+                  strategy: OVERWRITE
+                - createmissing: true
+                  field: studio
+                  strategy: MERGE
+                - createmissing: true
+                  field: performers
+                  strategy: MERGE
+                - createmissing: true
+                  field: tags
+                  strategy: MERGE
+            includemaleperformers: false
+            setcoverimage: true
+            setorganized: true
+            skipmultiplematches: true
+            skipmultiplematchtag: "50"
+            skipsinglenameperformers: true
+            skipsinglenameperformertag: null
+        paths: []
+        sceneids: []
+        sources:
+            - options: null
+              source:
+                scraperid: null
+                stashboxendpoint: https://stashdb.org/graphql
+                stashboxindex: null
+            - options:
+                fieldoptions: []
+                includemaleperformers: null
+                setcoverimage: null
+                setorganized: false
+                skipmultiplematches: true
+                skipmultiplematchtag: null
+                skipsinglenameperformers: true
+                skipsinglenameperformertag: null
+              source:
+                scraperid: builtin_autotag
+                stashboxendpoint: null
+                stashboxindex: null
+exclude:
+    - VR
+    - Archive/
+gallery_cover_regex: (poster|cover|folder|board)\.[^\.]+$
+generated: ""
+host: 0.0.0.0
+jwt_secret_key: 23e5720cbe3561eefbba6a14962d89b5a2f3a313e3af17a0e8c18410da099d8f
+menu_items:
+    - scenes
+    - images
+    - groups
+    - performers
+    - tags
+no_proxy: localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12
+nobrowser: false
+notifications_enabled: true
+parallel_tasks: 1
+plugins:
+    package_sources:
+        - localpath: community
+          name: Community (stable)
+          url: https://stashapp.github.io/CommunityScripts/stable/index.yml
+plugins_path: /root/.stash/plugins
+port: 9999
+preview_audio: true
+preview_exclude_end: "0"
+preview_exclude_start: "0"
+preview_segment_duration: 0.75
+preview_segments: 12
+scrapers:
+    package_sources:
+        - localpath: community
+          name: Community (stable)
+          url: https://stashapp.github.io/CommunityScrapers/stable/index.yml
+scrapers_path: /root/.stash/scrapers
+security_tripwire_accessed_from_public_internet: ""
+sequential_scanning: false
+session_store_key: ceb81171ef164fc8a7d7a7b72d316c057f4b8815f9fa8636a7c69ed5e2b65a27
+show_one_time_moved_notification: false
+show_scrubber: true
+sound_on_preview: false
+stash:
+    - excludeimage: false
+      excludevideo: false
+      path: /data
+stash_boxes:
+    - apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkZDJkY2RmOS00NjdmLTQ4MTQtOTY4MS1kYmQ3NmRkN2E5ZjMiLCJzdWIiOiJBUElLZXkiLCJpYXQiOjE2NjYxMzkyOTV9.sLp8HOxiqrSoEiI4mHJtT8qN8wnEgzh2tBTX5PPgooE
+      endpoint: https://stashdb.org/graphql
+      name: StashDB
+theme_color: '#202b33'
+ui:
+    advancedMode: true
+    defaultFilters:
+        scenes:
+            find_filter:
+                direction: DESC
+                page: 1
+                per_page: 40
+                q: ""
+                sort: file_mod_time
+            mode: SCENES
+            object_filter: {}
+            ui_options:
+                display_mode: 0
+                zoom_index: 1
+    frontPageContent:
+        - __typename: CustomFilter
+          direction: DESC
+          message:
+            id: recently_released_objects
+            values:
+                objects: Scenes
+          mode: SCENES
+          sortBy: date
+        - __typename: CustomFilter
+          direction: DESC
+          message:
+            id: recently_added_objects
+            values:
+                objects: Studios
+          mode: STUDIOS
+          sortBy: created_at
+        - __typename: CustomFilter
+          direction: DESC
+          message:
+            id: recently_released_objects
+            values:
+                objects: Groups
+          mode: GROUPS
+          sortBy: date
+        - __typename: CustomFilter
+          direction: DESC
+          message:
+            id: recently_added_objects
+            values:
+                objects: Performers
+          mode: PERFORMERS
+          sortBy: created_at
+        - __typename: CustomFilter
+          direction: DESC
+          message:
+            id: recently_released_objects
+            values:
+                objects: Galleries
+          mode: GALLERIES
+          sortBy: date
+    lastNoteSeen: 20251026
+    pinnedFilters:
+        scenes:
+            - orientation
+    taskDefaults:
+        generate:
+            clipPreviews: true
+            covers: true
+            imagePreviews: false
+            imageThumbnails: true
+            markerImagePreviews: false
+            markers: true
+            overwrite: false
+            phashes: true
+            previewOptions:
+                previewExcludeEnd: "0"
+                previewExcludeStart: "0"
+                previewPreset: slow
+                previewSegmentDuration: 0.75
+                previewSegments: 12
+            previews: true
+            sprites: true
+        scan:
+            scanGenerateClipPreviews: true
+            scanGenerateCovers: true
+            scanGenerateImagePreviews: false
+            scanGeneratePhashes: true
+            scanGeneratePreviews: true
+            scanGenerateSprites: true
+            scanGenerateThumbnails: false
+    trackActivity: false
+video_file_naming_algorithm: OSHASH
+wall_playback: video
+write_image_thumbnails: true

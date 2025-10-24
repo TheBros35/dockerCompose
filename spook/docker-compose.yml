@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   spook:
     image: thebros35/spook

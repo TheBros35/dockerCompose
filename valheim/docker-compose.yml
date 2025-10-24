@@ -1,5 +1,3 @@
-version: "3"
-
 services: 
   valheim: 
     image: lloesche/valheim-server
