@@ -1,5 +1,6 @@
+---
 services:
-  spook:
+    spook:
     image: thebros35/spook
     #ports:
     #  - "4321:8000"

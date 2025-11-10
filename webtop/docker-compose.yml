@@ -1,6 +1,7 @@
+---
 services:
   webtop:
-    image: ghcr.io/linuxserver/webtop
+    image: linuxserver/webtop
     container_name: webtop
     privileged: true #optional
     environment:
