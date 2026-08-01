@@ -1,0 +1,25 @@
+services:
+  haproxy:
+    build: .
+    image: haproxy-apache-php:latest
+    ports:
+      - "80:80"       # HAProxy HTTP (redirects to HTTPS)
+      - "443:443"     # HAProxy HTTPS (frontend from haproxy.cfg)
+      - "8443:8443"   # Apache HTTPS
+    depends_on:
+      - web-node1
+      - web-node2
+
+  web-node1:
+    image: nginx:alpine
+    volumes:
+    - ./web-nodes/html1:/usr/share/nginx/html:ro
+    - ./web-nodes/certs1:/etc/nginx/certs:ro
+    - ./web-nodes/nginx1.conf:/etc/nginx/conf.d/default.conf:ro
+
+  web-node2:
+    image: nginx:alpine
+    volumes:
+    - ./web-nodes/html2:/usr/share/nginx/html:ro
+    - ./web-nodes/certs2:/etc/nginx/certs:ro
+    - ./web-nodes/nginx2.conf:/etc/nginx/conf.d/default.conf:ro
