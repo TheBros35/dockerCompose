@@ -1,1 +1,2 @@
 Run any of these with their docker compose files. Except for "stats-with-https". Run docker compose build and then run the compose.
+Loadtesting is a python script to test connections to the webservers. Change the top four variables in order to run tests.

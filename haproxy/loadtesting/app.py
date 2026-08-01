@@ -4,7 +4,7 @@ import aiohttp
 
 # --- CONFIGURATION ---
 TARGET_URL = "https://localhost:443"  # Replace with your web server URL
-TOTAL_REQUESTS = 100000               # Total number of connections to open
+TOTAL_REQUESTS = 200000               # Total number of connections to open
 CONCURRENT_LIMIT = 500                # Maximum simultaneous open connections
 TIMEOUT_SECONDS = 10                 # Timeout for individual requests
 

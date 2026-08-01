@@ -3,7 +3,7 @@
  * HAProxy Backend Status Dashboard
  * ---------------------------------
  * Reads server state via the HAProxy runtime stats socket ("show stat")
- * and lets you change a server's state (ready / drain / maint) via the
+ * and lets you change a server's state (ready / drain) via the
  * same socket ("set server <backend>/<server> state <state>").
  *
  * REQUIREMENTS (haproxy.cfg):
@@ -26,7 +26,7 @@ $SOCKET_TYPE = 'unix';                       // 'unix' or 'tcp'
 $SOCKET_PATH = '/var/run/haproxy.sock';       // used if SOCKET_TYPE = unix
 $TCP_HOST    = '127.0.0.1';                   // used if SOCKET_TYPE = tcp
 $TCP_PORT    = 9999;                          // used if SOCKET_TYPE = tcp
-$REFRESH_SECS = 15;
+$REFRESH_SECS = 2;
 
 // HAProxy must be configured to log to this file (in addition to, or
 // instead of, stdout) for the log viewer below to work, e.g. add this
@@ -239,7 +239,6 @@ function status_class(string $status): string {
     $status = strtoupper($status);
     if (strpos($status, 'UP') === 0)   return 'status-up';
     if (strpos($status, 'DOWN') === 0) return 'status-down';
-    if (strpos($status, 'MAINT') === 0) return 'status-maint';
     if (strpos($status, 'DRAIN') === 0) return 'status-drain';
     return 'status-unknown';
 }
@@ -315,7 +314,6 @@ function status_class(string $status): string {
     }
     .status-up { background: #e6f4ea; color: #1e7a34; }
     .status-down { background: #fdecea; color: #a12622; }
-    .status-maint { background: #fff4e5; color: #a15c00; }
     .status-drain { background: #e8eef7; color: #2a5ea8; }
     .status-unknown { background: #eee; color: #555; }
     .actions form { display: inline-block; margin-right: 6px; }
@@ -328,7 +326,6 @@ function status_class(string $status): string {
         font-weight: 600;
     }
     .btn-drain { background: #2a5ea8; color: #fff; }
-    .btn-maint { background: #a15c00; color: #fff; }
     .btn-ready { background: #1e7a34; color: #fff; }
     .btn:hover { opacity: 0.85; }
     .empty-state {
@@ -385,7 +382,6 @@ function status_class(string $status): string {
 <h1>HAProxy Backend Status
     <span class="refresh-indicator" id="refresh-indicator">auto-refreshing every <?php echo (int)$REFRESH_SECS; ?>s</span>
 </h1>
-<div class="subtitle">Last loaded: <?php echo date('Y-m-d H:i:s'); ?></div>
 
 <div id="action-message">
 <?php if ($action_message !== null): ?>
@@ -468,7 +464,6 @@ function statusClass(status) {
     status = (status || '').toUpperCase();
     if (status.indexOf('UP') === 0) return 'status-up';
     if (status.indexOf('DOWN') === 0) return 'status-down';
-    if (status.indexOf('MAINT') === 0) return 'status-maint';
     if (status.indexOf('DRAIN') === 0) return 'status-drain';
     return 'status-unknown';
 }
@@ -608,8 +603,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 attachFormHandlers();
-setInterval(refreshStatus, REFRESH_SECS * 1000);
-setInterval(refreshLogs, REFRESH_SECS * 1000);
+
+function scheduleLoop(fn) {
+    // Self-scheduling loop: waits for the previous call to finish before
+    // scheduling the next one, so slow responses can't cause requests
+    // to pile up and burst-fire. Starts after one interval, since the
+    // page was already rendered server-side on load.
+    (function loop() {
+        setTimeout(async () => {
+            await fn();
+            loop();
+        }, REFRESH_SECS * 1000);
+    })();
+}
+
+scheduleLoop(refreshStatus);
+scheduleLoop(refreshLogs);
 </script>
 
 </body>

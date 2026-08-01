@@ -53,9 +53,6 @@ COPY supervisord.conf /etc/supervisord.conf
 # 80/443 = HAProxy, 8443 = Apache HTTPS
 EXPOSE 80 443 8443
 
-# Run syslogd to capture HAProxy logs
-RUN syslogd -O /var/log/haproxy/haproxy.log
-
 # NOTE: your TLS cert/key for HAProxy must be combined into a single PEM
 # and mounted at /usr/local/etc/haproxy/certs/lb.pem (see README).
 # Your Apache cert/key get mounted separately at /etc/apache2/ssl/.
