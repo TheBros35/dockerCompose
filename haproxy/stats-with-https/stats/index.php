@@ -23,10 +23,56 @@ session_start();
 // Configuration
 // ---------------------------------------------------------------------
 $SOCKET_TYPE = 'unix';                       // 'unix' or 'tcp'
-$SOCKET_PATH = '/var/run/haproxy.sock'; // used if SOCKET_TYPE = unix
+$SOCKET_PATH = '/var/run/haproxy.sock';       // used if SOCKET_TYPE = unix
 $TCP_HOST    = '127.0.0.1';                   // used if SOCKET_TYPE = tcp
 $TCP_PORT    = 9999;                          // used if SOCKET_TYPE = tcp
 $REFRESH_SECS = 15;
+
+// HAProxy must be configured to log to this file (in addition to, or
+// instead of, stdout) for the log viewer below to work, e.g. add this
+// line inside the `global` section of haproxy.cfg:
+//   log /var/log/haproxy/haproxy.log local0
+// and make sure /var/log/haproxy/ exists and is writable by HAProxy.
+$LOG_FILE_PATH     = '/var/log/haproxy/haproxy.log';
+$LOG_LINES_TO_SHOW = 200;
+
+// ---------------------------------------------------------------------
+// Efficiently read the last N lines of a (potentially large) log file
+// without loading the whole thing into memory.
+// ---------------------------------------------------------------------
+function tail_lines(string $filepath, int $numLines = 200, int $maxBytes = 131072): array {
+    if (!file_exists($filepath)) {
+        return [false, "Log file not found: $filepath"];
+    }
+    if (!is_readable($filepath)) {
+        return [false, "Log file not readable (permissions): $filepath"];
+    }
+
+    $fp = @fopen($filepath, 'r');
+    if (!$fp) {
+        return [false, "Could not open log file: $filepath"];
+    }
+
+    fseek($fp, 0, SEEK_END);
+    $filesize = ftell($fp);
+    $readSize = min($filesize, $maxBytes);
+    fseek($fp, -$readSize, SEEK_END);
+    $data = $readSize > 0 ? fread($fp, $readSize) : '';
+    fclose($fp);
+
+    $lines = preg_split('/\r\n|\r|\n/', $data);
+
+    // If we didn't read from the very start of the file, the first
+    // line is likely a partial line — drop it.
+    if ($readSize < $filesize && count($lines) > 1) {
+        array_shift($lines);
+    }
+
+    $lines = array_values(array_filter($lines, fn($l) => $l !== ''));
+    $lines = array_slice($lines, -$numLines);
+
+    return [true, $lines];
+}
 
 // ---------------------------------------------------------------------
 // Low-level socket helper: send a command to the HAProxy stats socket
@@ -113,7 +159,7 @@ function get_backend_status(): array {
 // Apply a state change to a specific server.
 // ---------------------------------------------------------------------
 function set_server_state(string $backend, string $server, string $state): array {
-    $allowed = ['ready', 'drain', 'maint'];
+    $allowed = ['ready', 'drain'];
     if (!in_array($state, $allowed, true)) {
         return [false, 'Invalid state requested'];
     }
@@ -175,7 +221,16 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'status') {
     exit;
 }
 
+// If this is an AJAX poll for fresh log data, respond with JSON only.
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'logs') {
+    header('Content-Type: application/json');
+    [$ok, $result] = tail_lines($LOG_FILE_PATH, $LOG_LINES_TO_SHOW);
+    echo json_encode($ok ? ['ok' => true, 'lines' => $result] : ['ok' => false, 'error' => $result]);
+    exit;
+}
+
 $status = get_backend_status();
+[$log_ok, $log_result] = tail_lines($LOG_FILE_PATH, $LOG_LINES_TO_SHOW);
 
 // ---------------------------------------------------------------------
 // Helper for status badge styling
@@ -281,6 +336,48 @@ function status_class(string $status): string {
         text-align: center;
         color: #888;
     }
+    .log-section {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        margin-top: 24px;
+        overflow: hidden;
+    }
+    .log-section summary {
+        cursor: pointer;
+        padding: 12px 16px;
+        font-size: 15px;
+        font-weight: 600;
+        background: #2a2f45;
+        color: #fff;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .log-section summary::-webkit-details-marker { display: none; }
+    .log-section summary .arrow { transition: transform 0.15s ease; }
+    .log-section[open] summary .arrow { transform: rotate(90deg); }
+    .log-meta {
+        font-size: 11px;
+        font-weight: 400;
+        color: #b7bcd6;
+        margin-left: 8px;
+    }
+    .log-box {
+        background: #12141f;
+        color: #d7dae8;
+        margin: 0;
+        padding: 14px 16px;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.5;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    .log-box .log-error { color: #ff8a80; }
 </style>
 </head>
 <body>
@@ -331,7 +428,7 @@ function status_class(string $status): string {
                         <td><?php echo htmlspecialchars($srv['check_status'] ?? ''); ?></td>
                         <td><?php echo htmlspecialchars($srv['scur'] ?? '0'); ?></td>
                         <td class="actions">
-                            <?php foreach (['ready' => 'Ready', 'drain' => 'Drain', 'maint' => 'Maint'] as $stateVal => $label): ?>
+                            <?php foreach (['ready' => 'Up', 'drain' => 'Drain'] as $stateVal => $label): ?>
                                 <form method="post" class="state-form">
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                                     <input type="hidden" name="backend" value="<?php echo htmlspecialchars($backendName); ?>">
@@ -349,6 +446,19 @@ function status_class(string $status): string {
     <?php endforeach; ?>
 <?php endif; ?>
 </div>
+
+<details class="log-section" id="log-section">
+    <summary>
+        <span><span class="arrow">▶</span> Recent HAProxy Logs <span class="log-meta">(last <?php echo (int)$LOG_LINES_TO_SHOW; ?> lines, auto-refreshing)</span></span>
+    </summary>
+    <pre class="log-box" id="log-content"><?php
+        if ($log_ok) {
+            echo htmlspecialchars(implode("\n", $log_result));
+        } else {
+            echo '<span class="log-error">' . htmlspecialchars($log_result) . '</span>';
+        }
+    ?></pre>
+</details>
 
 <script>
 const REFRESH_SECS = <?php echo (int)$REFRESH_SECS; ?>;
@@ -404,7 +514,7 @@ function renderDashboard(data) {
                 <td>${escapeHtml(srv.scur || '0')}</td>
                 <td class="actions">`;
 
-            [['ready', 'Ready'], ['drain', 'Drain'], ['maint', 'Maint']].forEach(([stateVal, label]) => {
+            [['ready', 'Up'], ['drain', 'Drain']].forEach(([stateVal, label]) => {
                 html += `<form method="post" class="state-form">
                     <input type="hidden" name="csrf_token" value="${escapeHtml(CSRF_TOKEN)}">
                     <input type="hidden" name="backend" value="${escapeHtml(backendName)}">
@@ -465,8 +575,41 @@ async function refreshStatus() {
     }
 }
 
+async function refreshLogs() {
+    const logBox = document.getElementById('log-content');
+    if (!logBox) return;
+
+    // Only auto-scroll if the user is already at (or near) the bottom,
+    // so we don't yank their scroll position while they're reading.
+    const nearBottom = (logBox.scrollHeight - logBox.scrollTop - logBox.clientHeight) < 30;
+
+    try {
+        const resp = await fetch(window.location.pathname + '?ajax=logs');
+        const data = await resp.json();
+
+        if (data.ok) {
+            logBox.textContent = (data.lines || []).join('\n');
+        } else {
+            logBox.innerHTML = `<span class="log-error">${escapeHtml(data.error)}</span>`;
+        }
+
+        if (nearBottom) {
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+    } catch (err) {
+        console.error('Failed to refresh logs', err);
+    }
+}
+
+// Scroll the log box to the bottom on initial load.
+document.addEventListener('DOMContentLoaded', () => {
+    const logBox = document.getElementById('log-content');
+    if (logBox) logBox.scrollTop = logBox.scrollHeight;
+});
+
 attachFormHandlers();
 setInterval(refreshStatus, REFRESH_SECS * 1000);
+setInterval(refreshLogs, REFRESH_SECS * 1000);
 </script>
 
 </body>

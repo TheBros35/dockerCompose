@@ -12,7 +12,8 @@ RUN apk add --no-cache \
         php-openssl \
         php-session \
         supervisor \
-        tzdata
+        tzdata \
+        busybox-extras
 
 # mod_php is NOT thread-safe, so Apache must run the prefork MPM
 # (not the event/worker MPM that's often the Alpine default).
@@ -29,6 +30,7 @@ RUN mkdir -p \
         /etc/apache2/ssl \
         /run/apache2 \
         /var/www/localhost/htdocs \
+        /var/log/haproxy \
     && rm -f /var/www/localhost/htdocs/index.html \
     && chown -R apache:apache /var/www/localhost/htdocs /run/apache2
 
@@ -50,6 +52,9 @@ COPY supervisord.conf /etc/supervisord.conf
 
 # 80/443 = HAProxy, 8443 = Apache HTTPS
 EXPOSE 80 443 8443
+
+# Run syslogd to capture HAProxy logs
+RUN syslogd -O /var/log/haproxy/haproxy.log
 
 # NOTE: your TLS cert/key for HAProxy must be combined into a single PEM
 # and mounted at /usr/local/etc/haproxy/certs/lb.pem (see README).
