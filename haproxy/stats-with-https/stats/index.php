@@ -17,7 +17,18 @@
  * not implement its own authentication.
  */
 
+// Harden the session cookie before starting the session.
+session_set_cookie_params([
+    'secure'   => true,      // only send cookie over HTTPS
+    'httponly' => true,      // not accessible to JavaScript
+    'samesite' => 'Strict',  // not sent on cross-site requests
+]);
 session_start();
+
+// Mitigate clickjacking: this page has admin action buttons, so it
+// must never be rendered inside a frame on another origin.
+header('X-Frame-Options: DENY');
+header("Content-Security-Policy: frame-ancestors 'none'");
 
 // ---------------------------------------------------------------------
 // Configuration
