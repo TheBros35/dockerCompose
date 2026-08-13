@@ -1,14 +1,24 @@
----
 services:
-    spook:
+  spook:
+    build: .
     image: thebros35/spook
-    #ports:
-    #  - "4321:8000"
-    #  - "9:9/udp"
-    volumes:
-      - spookVolume:/app/db
-    restart: always
+    container_name: spook
+    restart: unless-stopped
     network_mode: host
 
+    environment:
+      DJANGO_DEBUG: "false"
+      DJANGO_ALLOWED_HOSTS: "*"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-please-change-this-secret-key}"
+      DJANGO_DATA_DIR: /app/data
+      TZ: "${TZ:-UTC}"
+      # Optional: auto-create a Django admin user on first boot.
+      # DJANGO_SUPERUSER_USERNAME: admin
+      # DJANGO_SUPERUSER_PASSWORD: change-me
+      # DJANGO_SUPERUSER_EMAIL: admin@example.com
+
+    volumes:
+      - spook-data:/app/data
+      
 volumes:
-  spookVolume:
+  spook-data:
